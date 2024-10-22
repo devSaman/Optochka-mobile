@@ -105,12 +105,15 @@ Page resource error:
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: isLoading?
-        Center(child: Container(color: Colors.red,  height: 100, width: 100))
-        : SafeArea(
-      child: WebViewWidget(
-        controller: _controller,
-      ),
-    ));
+      body: isLoading
+          ? Center(
+              child: Image.asset('assets/img/optochka_logo.png',
+                  width: MediaQuery.of(context).size.width - 100),
+            )
+          : SafeArea(
+              child: WebViewWidget(
+              controller: _controller,
+            )),
+    );
   }
 }
