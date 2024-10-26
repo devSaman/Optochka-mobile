@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 // Import for iOS features.
@@ -38,11 +40,11 @@ class _WebViewScreenState extends State<WebViewScreen> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            if (progress == 100) {
-              setState(() {
-                isLoading = false;
-              });
-            }
+            // if (progress == 100) {
+            //   setState(() {
+            //     isLoading = false;
+            //   });
+            // }
             debugPrint('WebView is loading (progress : $progress%)');
           },
           onPageStarted: (String url) {
@@ -99,21 +101,49 @@ Page resource error:
 
     _controller = controller;
 
+    _controllerVideo = VideoPlayerController.asset('assets/videos/1025.mp4')
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {});
+      });
+    _controllerVideo.setLooping(true);
+    _controllerVideo.play();
+
+    Future.delayed(
+      const Duration(milliseconds: 5100),
+    ).then((val) {
+      setState(() {
+        _controllerVideo.pause();
+        isLoading = false;
+      });
+    });
+
     super.initState();
   }
 
   @override
+  void dispose() {
+    _controllerVideo.dispose();
+    super.dispose();
+  }
+
+  late VideoPlayerController _controllerVideo;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: isLoading
           ? Center(
-              child: Image.asset('assets/img/optochka_logo.png',
-                  width: MediaQuery.of(context).size.width - 100),
-            )
+              child: AspectRatio(
+              aspectRatio: _controllerVideo.value.aspectRatio,
+              child: VideoPlayer(_controllerVideo),
+            ))
           : SafeArea(
               child: WebViewWidget(
-              controller: _controller,
-            )),
+                controller: _controller,
+              ),
+            ),
     );
   }
 }
