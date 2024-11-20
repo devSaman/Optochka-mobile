@@ -1,5 +1,6 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
+import 'package:optochka_mobile/notification_service.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -16,8 +17,28 @@ class WebViewScreen extends StatefulWidget {
 class _WebViewScreenState extends State<WebViewScreen> {
   late final WebViewController _controller;
   bool isLoading = true;
+  void getFcmToken() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    messaging.requestPermission(
+      alert: true,
+      announcement: true,
+      badge: true,
+      carPlay: true,
+      criticalAlert: true,
+      provisional: true,
+      sound: true,
+    );
+    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    if (apnsToken != null) {
+      print("here bro $apnsToken");
+    }
+    final fcm_token = await messaging.getToken();
+    print(fcm_token);
+  }
+
   @override
   void initState() {
+    getFcmToken();
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
       params = WebKitWebViewControllerCreationParams(
@@ -132,6 +153,14 @@ Page resource error:
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          NotificationService().showNotification(
+              title: "This is first one", body: "This is second one");
+        },
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ), 
       backgroundColor: Colors.white,
       body: isLoading
           ? Center(

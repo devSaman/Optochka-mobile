@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "538980206432",
+    "project_id": "optochkanotify",
+    "storage_bucket": "optochkanotify.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538980206432:android:efc9b5bf569c6d7abd8005",
+        "android_client_info": {
+          "package_name": "com.optochka.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyPAuBpyx1cRRWL6oVUDG-0roXQXEw6jE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

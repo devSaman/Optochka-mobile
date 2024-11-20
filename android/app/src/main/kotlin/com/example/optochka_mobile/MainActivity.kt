@@ -1,4 +1,4 @@
-package com.example.optochka_mobile
+package com.optochka.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

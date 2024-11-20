@@ -1,0 +1,11 @@
+{
+  "aps": {
+    "alert": {
+      "title": "Test Push",
+      "body": "Success! Push notification in simulator! 🎉",
+      "sound": "default"
+    },
+    "badge": 1
+  },
+  "Simulator Target Bundle": "com.example.optochkaMobile"
+}
