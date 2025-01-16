@@ -505,8 +505,8 @@
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = XK28C4CN7P;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 11;
-				FLUTTER_BUILD_NUMBER = 4;
+				FLUTTER_BUILD_NAME = 12;
+				FLUTTER_BUILD_NUMBER = 1;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Optochka Mobile";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
@@ -699,8 +699,8 @@
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = XK28C4CN7P;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 11;
-				FLUTTER_BUILD_NUMBER = 4;
+				FLUTTER_BUILD_NAME = 12;
+				FLUTTER_BUILD_NUMBER = 1;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Optochka Mobile";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
@@ -733,8 +733,8 @@
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = XK28C4CN7P;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 11;
-				FLUTTER_BUILD_NUMBER = 4;
+				FLUTTER_BUILD_NAME = 12;
+				FLUTTER_BUILD_NUMBER = 1;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Optochka Mobile";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";

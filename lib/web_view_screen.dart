@@ -1,11 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:optochka_mobile/notification_service.dart';
 import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
-// Import for iOS features.
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 class WebViewScreen extends StatefulWidget {
   const WebViewScreen({super.key});
@@ -17,28 +19,60 @@ class WebViewScreen extends StatefulWidget {
 class _WebViewScreenState extends State<WebViewScreen> {
   late final WebViewController _controller;
   bool isLoading = true;
+  String fcmToken = "";
+
   void getFcmToken() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     messaging.requestPermission(
       alert: true,
-      announcement: true,
+      announcement: false,
       badge: true,
-      carPlay: true,
-      criticalAlert: true,
-      provisional: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
       sound: true,
     );
-    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-    if (apnsToken != null) {
-      print("here bro $apnsToken");
-    }
     final fcm_token = await messaging.getToken();
-    print(fcm_token);
+    fcmToken = fcm_token ?? "";
+    final result = await _controller.runJavaScriptReturningResult(
+      'JSON.stringify(localStorage);',
+    );
+    if (result != null) {
+      final localStorageMap = jsonDecode(result
+          .toString()
+          .replaceAll(r'\"', '"')
+          .replaceAll(r'\\', '')
+          .replaceAll('"{', '{')
+          .replaceAll('}"', '}')) as Map<String, dynamic>;
+      accessToken = localStorageMap['persist:root']['settings']['credentials']
+          ['accessToken'];
+      if (accessToken != null) {
+        sentTokenApi(fcm_token ?? "", accessToken);
+      }
+    }
+  }
+
+  void sentTokenApi(String token, accessToken) async {
+    print("ACCEss token $accessToken");
+    print(" token $token");
+    final result = await http.put(
+      Uri.parse('https://backend.optochka.com/users/device-token'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': accessToken,
+      },
+      body: json.encode(
+        {"token": token, "system": Platform.operatingSystem},
+      ),
+    );
+    print(result.body);
   }
 
   @override
   void initState() {
-    getFcmToken();
+    Future.delayed(const Duration(seconds: 2), () {
+      getFcmToken();
+    });
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
       params = WebKitWebViewControllerCreationParams(
@@ -50,22 +84,12 @@ class _WebViewScreenState extends State<WebViewScreen> {
     }
     final WebViewController controller =
         WebViewController.fromPlatformCreationParams(params);
-
-    // controller = WebViewController()
-    //   ..loadRequest(
-    //     Uri.parse('https://mobile.optochka.com'),
-    //   );
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            // if (progress == 100) {
-            //   setState(() {
-            //     isLoading = false;
-            //   });
-            // }
             debugPrint('WebView is loading (progress : $progress%)');
           },
           onPageStarted: (String url) {
@@ -95,11 +119,12 @@ Page resource error:
             debugPrint('Error occurred on page: ${error.response?.statusCode}');
           },
           onUrlChange: (UrlChange change) {
+            if (change.url == "https://mobile.optochka.com/") {
+              getFcmToken();
+            }
             debugPrint('url change to ${change.url}');
           },
-          onHttpAuthRequest: (HttpAuthRequest request) {
-            // openDialog(request);
-          },
+          onHttpAuthRequest: (HttpAuthRequest request) {},
         ),
       )
       ..addJavaScriptChannel(
@@ -111,35 +136,35 @@ Page resource error:
         },
       )
       ..loadRequest(Uri.parse('https://mobile.optochka.com/'));
-
-    // #docregion platform_features
     if (controller.platform is AndroidWebViewController) {
       AndroidWebViewController.enableDebugging(true);
       (controller.platform as AndroidWebViewController)
           .setMediaPlaybackRequiresUserGesture(false);
     }
-    // #enddocregion platform_features
-
     _controller = controller;
-
     _controllerVideo = VideoPlayerController.asset('assets/videos/1025.mp4')
       ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});
       });
     _controllerVideo.setLooping(true);
     _controllerVideo.play();
-
     Future.delayed(
       const Duration(milliseconds: 5100),
     ).then((val) {
       setState(() {
         _controllerVideo.pause();
         isLoading = false;
+        requestPermissions();
       });
     });
-
     super.initState();
+  }
+
+  void requestPermissions() async {
+    if (await Permission.camera.request().isGranted &&
+        await Permission.photos.request().isGranted &&
+        await Permission.manageExternalStorage.request().isGranted) {
+    } else {}
   }
 
   @override
@@ -149,18 +174,12 @@ Page resource error:
   }
 
   late VideoPlayerController _controllerVideo;
+  String? localStorageData;
+  String? accessToken;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          NotificationService().showNotification(
-              title: "This is first one", body: "This is second one");
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), 
       backgroundColor: Colors.white,
       body: isLoading
           ? Center(
