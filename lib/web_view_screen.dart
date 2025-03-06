@@ -9,6 +9,8 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 
+import 'notification_service.dart';
+
 class WebViewScreen extends StatefulWidget {
   const WebViewScreen({super.key});
 
@@ -70,9 +72,12 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
   @override
   void initState() {
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () {
       getFcmToken();
     });
+    // NotificationService().showNotification(
+    // title: "Notification title",
+    // body: "Notification body");
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
       params = WebKitWebViewControllerCreationParams(

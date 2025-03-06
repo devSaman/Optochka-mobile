@@ -7,13 +7,11 @@ import 'package:rxdart/rxdart.dart';
 import 'firebase_options.dart';
 import 'web_view_screen.dart';
 
-FirebaseMessaging messaging = FirebaseMessaging.instance;
+// FirebaseMessaging messaging = FirebaseMessaging.instance;
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  NotificationService().initNotification();
-  print("ON back $message");
   final _messageStreamController = BehaviorSubject<RemoteMessage>();
   NotificationService().showNotification(
       title: "${message.notification?.title}",
@@ -28,14 +26,12 @@ Future<void> main() async {
   final _messageStreamController = BehaviorSubject<RemoteMessage>();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print("ON MESSAGE $message");
     NotificationService().showNotification(
         title: "${message.notification?.title}",
         body: "${message.notification?.body}");
     _messageStreamController.sink.add(message);
   });
 
-  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 

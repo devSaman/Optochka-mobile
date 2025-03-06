@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -9,12 +10,12 @@ class NotificationService {
         const AndroidInitializationSettings('ic_launcher');
 
     var initializationSettingsIOS = DarwinInitializationSettings(
+        defaultPresentSound: true,
         requestAlertPermission: true,
         requestBadgePermission: true,
         requestSoundPermission: true,
         onDidReceiveLocalNotification:
             (int id, String? title, String? body, String? payload) async {});
-
     var initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     await notificationsPlugin.initialize(initializationSettings,
@@ -22,25 +23,23 @@ class NotificationService {
             (NotificationResponse notificationResponse) async {});
   }
 
-  notificationDetails() {
+  notificationDetails() async {
+    // final player = AudioPlayer();
+    // await player.play(AssetSource('new_order.mp3'));
     return const NotificationDetails(
       android: AndroidNotificationDetails('channelId', 'channelName',
           importance: Importance.max,
           playSound: true,
-          sound: RawResourceAndroidNotificationSound('test'),
           icon: '@mipmap/ic_launcher'),
       iOS: DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
-        sound: 'test.caf'
-        
       ),
       macOS: DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
-        
       ),
     );
   }
